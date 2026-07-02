@@ -8,11 +8,16 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:gal/gal.dart';
 import 'package:flutter_wallpaper_manager/flutter_wallpaper_manager.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wallpaper/core/DI/dependency_injection.dart';
+import 'package:wallpaper/features/favorites/logic/favorites_cubit.dart';
+import 'package:wallpaper/features/favorites/logic/favorites_state.dart';
+import 'package:wallpaper/features/home/data/models/wallpaper_model.dart';
 
 class WallpaperViewScreen extends StatefulWidget {
-  final String imageUrl;
+  final WallpaperModel model;
 
-  const WallpaperViewScreen({super.key, required this.imageUrl});
+  const WallpaperViewScreen({super.key, required this.model});
 
   @override
   State<WallpaperViewScreen> createState() => _WallpaperViewScreenState();
@@ -74,7 +79,7 @@ class _WallpaperViewScreenState extends State<WallpaperViewScreen>
     return true;
   }
 
-  Future<void> _downloadImage() async {
+  Future<void> _downloadImage(String url) async {
     if (_isDownloading) return;
     setState(() => _isDownloading = true);
     if (!await _requestPermission()) {
@@ -83,7 +88,7 @@ class _WallpaperViewScreenState extends State<WallpaperViewScreen>
     }
     try {
       var response = await Dio().get(
-        widget.imageUrl,
+        url,
         options: Options(responseType: ResponseType.bytes),
       );
       final directory = await getTemporaryDirectory();
@@ -101,7 +106,7 @@ class _WallpaperViewScreenState extends State<WallpaperViewScreen>
     if (mounted) setState(() => _isDownloading = false);
   }
 
-  Future<void> _shareImage() async {
+  Future<void> _shareImage(String url) async {
     if (_isSharing) return;
     setState(() => _isSharing = true);
     if (!await _requestPermission()) {
@@ -111,7 +116,7 @@ class _WallpaperViewScreenState extends State<WallpaperViewScreen>
     try {
       final directory = await getTemporaryDirectory();
       final filePath = '${directory.path}/shared_wallpaper.jpg';
-      await Dio().download(widget.imageUrl, filePath);
+      await Dio().download(url, filePath);
       await Share.shareXFiles([XFile(filePath)],
           text: '📸 خلفية رائعة من WallpaperHub!');
     } catch (e) {
@@ -121,12 +126,12 @@ class _WallpaperViewScreenState extends State<WallpaperViewScreen>
     if (mounted) setState(() => _isSharing = false);
   }
 
-  Future<void> _setWallpaper(int location) async {
+  Future<void> _setWallpaper(int location, String url) async {
     if (_isSettingWallpaper) return;
     setState(() => _isSettingWallpaper = true);
     try {
       var response = await Dio().get(
-        widget.imageUrl,
+        url,
         options: Options(responseType: ResponseType.bytes),
       );
       final directory = await getTemporaryDirectory();
@@ -147,7 +152,7 @@ class _WallpaperViewScreenState extends State<WallpaperViewScreen>
     if (mounted) setState(() => _isSettingWallpaper = false);
   }
 
-  void _showSetWallpaperOptions() {
+  void _showSetWallpaperOptions(String url) {
     showModalBottomSheet(
       context: context,
       backgroundColor: const Color(0xFF1A1A2E),
@@ -173,33 +178,33 @@ class _WallpaperViewScreenState extends State<WallpaperViewScreen>
                 'تعيين كخلفية',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
               const SizedBox(height: 16),
               ListTile(
-                leading: const Icon(Icons.home_rounded, color: Colors.white70),
-                title: const Text('الشاشة الرئيسية', style: TextStyle(color: Colors.white)),
+                leading: const Icon(Icons.home_rounded, color: Colors.white70, size: 26),
+                title: const Text('الشاشة الرئيسية', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
                 onTap: () {
                   Navigator.pop(context);
-                  _setWallpaper(WallpaperManager.HOME_SCREEN);
+                  _setWallpaper(WallpaperManager.HOME_SCREEN, url);
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.lock_rounded, color: Colors.white70),
-                title: const Text('شاشة القفل', style: TextStyle(color: Colors.white)),
+                leading: const Icon(Icons.lock_rounded, color: Colors.white70, size: 26),
+                title: const Text('شاشة القفل', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
                 onTap: () {
                   Navigator.pop(context);
-                  _setWallpaper(WallpaperManager.LOCK_SCREEN);
+                  _setWallpaper(WallpaperManager.LOCK_SCREEN, url);
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.screen_share_rounded, color: Colors.white70),
-                title: const Text('كلتا الشاشتين', style: TextStyle(color: Colors.white)),
+                leading: const Icon(Icons.screen_share_rounded, color: Colors.white70, size: 26),
+                title: const Text('كلتا الشاشتين', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
                 onTap: () {
                   Navigator.pop(context);
-                  _setWallpaper(WallpaperManager.BOTH_SCREEN);
+                  _setWallpaper(WallpaperManager.BOTH_SCREEN, url);
                 },
               ),
               const SizedBox(height: 16),
@@ -225,28 +230,32 @@ class _WallpaperViewScreenState extends State<WallpaperViewScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          // Full-screen wallpaper with Hero
-          Hero(
-            tag: widget.imageUrl,
-            child: Image.network(
-              widget.imageUrl,
-              fit: BoxFit.cover,
-              loadingBuilder: (ctx, child, progress) {
-                if (progress == null) return child;
-                return Container(
-                  color: Colors.black,
-                  child: const Center(
-                    child: CircularProgressIndicator(color: Color(0xFF7C5CFC)),
-                  ),
-                );
-              },
+    final imageUrl = widget.model.src?.original ?? widget.model.src?.portrait ?? '';
+
+    return BlocProvider<FavoritesCubit>.value(
+      value: getIt<FavoritesCubit>()..getFavorites(),
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Full-screen wallpaper with Hero
+            Hero(
+              tag: imageUrl,
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.cover,
+                loadingBuilder: (ctx, child, progress) {
+                  if (progress == null) return child;
+                  return Container(
+                    color: Colors.black,
+                    child: const Center(
+                      child: CircularProgressIndicator(color: Color(0xFF7C5CFC)),
+                    ),
+                  );
+                },
+              ),
             ),
-          ),
 
           // Back button - top left
           Positioned(
@@ -275,6 +284,47 @@ class _WallpaperViewScreenState extends State<WallpaperViewScreen>
                   ),
                 ),
               ),
+            ),
+          ),
+
+          // Favorite button - top right
+          Positioned(
+            top: 52,
+            right: 20,
+            child: BlocBuilder<FavoritesCubit, FavoritesState>(
+              builder: (context, state) {
+                final isFav = context.read<FavoritesCubit>().isFavorite(widget.model);
+                return GestureDetector(
+                  onTap: () => context.read<FavoritesCubit>().toggleFavorite(widget.model),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(14),
+                    child: BackdropFilter(
+                      filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        width: 46,
+                        height: 46,
+                        decoration: BoxDecoration(
+                          color: isFav
+                              ? const Color(0xFFE94057).withValues(alpha: 0.2)
+                              : Colors.black.withValues(alpha: 0.35),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                              color: isFav
+                                  ? const Color(0xFFE94057).withValues(alpha: 0.5)
+                                  : Colors.white.withValues(alpha: 0.15),
+                              width: 1),
+                        ),
+                        child: Icon(
+                          isFav ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                          color: isFav ? const Color(0xFFE94057) : Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
 
@@ -317,7 +367,7 @@ class _WallpaperViewScreenState extends State<WallpaperViewScreen>
                               gradient: const LinearGradient(
                                 colors: [Color(0xFFE94057), Color(0xFFF27121)],
                               ),
-                              onTap: _showSetWallpaperOptions,
+                              onTap: () => _showSetWallpaperOptions(imageUrl),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -329,7 +379,7 @@ class _WallpaperViewScreenState extends State<WallpaperViewScreen>
                               gradient: const LinearGradient(
                                 colors: [Color(0xFF7C5CFC), Color(0xFF5A3FC0)],
                               ),
-                              onTap: _downloadImage,
+                              onTap: () => _downloadImage(imageUrl),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -341,7 +391,7 @@ class _WallpaperViewScreenState extends State<WallpaperViewScreen>
                               gradient: const LinearGradient(
                                 colors: [Color(0xFF5CE1E6), Color(0xFF3BAAB0)],
                               ),
-                              onTap: _shareImage,
+                              onTap: () => _shareImage(imageUrl),
                             ),
                           ),
                         ],
@@ -354,6 +404,7 @@ class _WallpaperViewScreenState extends State<WallpaperViewScreen>
           ),
         ],
       ),
+    ),
     );
   }
 }
@@ -379,7 +430,7 @@ class _ActionButton extends StatelessWidget {
       onTap: isLoading ? null : onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        height: 56,
+        height: 60,
         decoration: BoxDecoration(
           gradient: isLoading ? null : gradient,
           color: isLoading ? Colors.white12 : null,
@@ -407,14 +458,15 @@ class _ActionButton extends StatelessWidget {
               : Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(icon, color: Colors.white, size: 18),
+                    Icon(icon, color: Colors.white, size: 20),
                     const SizedBox(width: 6),
                     Text(
                       label,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 15,
+                        letterSpacing: 0.3,
                       ),
                     ),
                   ],

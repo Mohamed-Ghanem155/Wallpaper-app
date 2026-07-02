@@ -4,8 +4,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:wallpaper/core/DI/dependency_injection.dart';
 import 'package:wallpaper/core/routing/app_router.dart';
 
-void main() {
+import 'package:shared_preferences/shared_preferences.dart';
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  final prefs = await SharedPreferences.getInstance();
+
   // Increase image cache to keep more images in memory (500MB, 1000 images)
   PaintingBinding.instance.imageCache.maximumSize = 1000;
   PaintingBinding.instance.imageCache.maximumSizeBytes = 500 << 20;
@@ -13,7 +18,7 @@ void main() {
     statusBarColor: Colors.transparent,
     statusBarIconBrightness: Brightness.light,
   ));
-  setupGetIt();
+  setupGetIt(prefs);
   runApp(const MyApp());
 }
 
@@ -33,7 +38,7 @@ class MyApp extends StatelessWidget {
           secondary: Color(0xFF5CE1E6),
           surface: Color(0xFF13131A),
         ),
-        textTheme: GoogleFonts.outfitTextTheme(ThemeData.dark().textTheme),
+        textTheme: GoogleFonts.cairoTextTheme(ThemeData.dark().textTheme),
         useMaterial3: true,
       ),
       routerConfig: AppRouter.router,

@@ -116,8 +116,9 @@ class _HomeBodyState extends State<HomeBody>
                         child: const Text(
                           'Wallpaper',
                           style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w800,
+                            fontSize: 32,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -0.5,
                             color: Colors.white,
                           ),
                         ),
@@ -125,20 +126,22 @@ class _HomeBodyState extends State<HomeBody>
                       const Text(
                         'Hub',
                         style: TextStyle(
-                          fontSize: 28,
+                          fontSize: 32,
                           fontWeight: FontWeight.w300,
+                          letterSpacing: -0.5,
                           color: Colors.white70,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
                   const Text(
                     'Discover stunning wallpapers',
                     style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.white38,
-                      fontWeight: FontWeight.w400,
+                      fontSize: 15,
+                      color: Colors.white60,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 0.2,
                     ),
                   ),
                 ],
@@ -169,10 +172,10 @@ class _HomeBodyState extends State<HomeBody>
             ),
             child: TextFormField(
               controller: _searchCtrl,
-              style: const TextStyle(color: Colors.white, fontSize: 16),
+              style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
               decoration: const InputDecoration(
                 hintText: 'Search wallpapers...',
-                hintStyle: TextStyle(color: Colors.white38, fontSize: 15),
+                hintStyle: TextStyle(color: Colors.white38, fontSize: 15, fontWeight: FontWeight.w400),
                 prefixIcon: Icon(Icons.search_rounded,
                     color: Color(0xFF7C5CFC), size: 22),
                 border: InputBorder.none,
@@ -192,14 +195,14 @@ class _HomeBodyState extends State<HomeBody>
 
   Widget _buildSectionHeader(String title) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 14),
       child: Text(
         title,
         style: const TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.w700,
+          fontSize: 24,
+          fontWeight: FontWeight.w800,
           color: Colors.white,
-          letterSpacing: 0.3,
+          letterSpacing: 0.5,
         ),
       ),
     );

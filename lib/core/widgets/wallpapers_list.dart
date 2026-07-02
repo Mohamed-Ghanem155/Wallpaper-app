@@ -15,13 +15,10 @@ class WallpapersGrid extends StatelessWidget {
       delegate: SliverChildBuilderDelegate(
         (context, index) {
           final wallpaper = wallpapers[index];
-          final imageUrl = wallpaper.src?.portrait ?? '';
-          // Alternate heights for masonry feel
           final isEven = index % 2 == 0;
           return _WallpaperCard(
-            imageUrl: imageUrl,
+            model: wallpaper,
             tall: isEven,
-            photographer: wallpaper.photographer ?? '',
           );
         },
         childCount: wallpapers.length,
@@ -37,14 +34,12 @@ class WallpapersGrid extends StatelessWidget {
 }
 
 class _WallpaperCard extends StatefulWidget {
-  final String imageUrl;
+  final WallpaperModel model;
   final bool tall;
-  final String photographer;
 
   const _WallpaperCard({
-    required this.imageUrl,
+    required this.model,
     required this.tall,
-    required this.photographer,
   });
 
   @override
@@ -81,8 +76,8 @@ class _WallpaperCardState extends State<_WallpaperCard>
       onTapDown: (_) => _scaleCtrl.reverse(),
       onTapUp: (_) {
         _scaleCtrl.forward();
-        if (widget.imageUrl.isNotEmpty) {
-          context.push(Routes.wallpaperViewScreen, extra: widget.imageUrl);
+        if (widget.model.src?.portrait != null) {
+          context.push(Routes.wallpaperViewScreen, extra: widget.model);
         }
       },
       onTapCancel: () => _scaleCtrl.forward(),
@@ -95,7 +90,7 @@ class _WallpaperCardState extends State<_WallpaperCard>
             children: [
               // Image
               Image.network(
-                widget.imageUrl,
+                widget.model.src?.portrait ?? '',
                 fit: BoxFit.cover,
                 loadingBuilder: (context, child, progress) {
                   if (progress == null) return child;
@@ -133,7 +128,7 @@ class _WallpaperCardState extends State<_WallpaperCard>
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                   child: Text(
-                    widget.photographer,
+                    widget.model.photographer ?? '',
                     style: const TextStyle(
                       color: Colors.white70,
                       fontSize: 11,
@@ -173,11 +168,9 @@ class WallpapersList extends StatelessWidget {
       itemCount: wallpapers.length,
       itemBuilder: (context, index) {
         final wallpaper = wallpapers[index];
-        final imageUrl = wallpaper.src?.portrait ?? '';
         return _WallpaperCard(
-          imageUrl: imageUrl,
+          model: wallpaper,
           tall: index % 2 == 0,
-          photographer: wallpaper.photographer ?? '',
         );
       },
     );

@@ -76,7 +76,7 @@ class _SearchScreenState extends State<SearchScreen> {
               flexibleSpace: FlexibleSpaceBar(
                 titlePadding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
                 title: Container(
-                  height: 42,
+                  height: 46,
                   margin: const EdgeInsets.only(left: 45),
                   decoration: BoxDecoration(
                     color: const Color(0xFF1E1E2E).withValues(alpha: 0.8),
@@ -88,10 +88,10 @@ class _SearchScreenState extends State<SearchScreen> {
                   ),
                   child: TextFormField(
                     controller: _searchCtrl,
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                    style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
                     decoration: const InputDecoration(
                       hintText: 'Search...',
-                      hintStyle: TextStyle(color: Colors.white38, fontSize: 13),
+                      hintStyle: TextStyle(color: Colors.white38, fontSize: 15, fontWeight: FontWeight.w400),
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     ),

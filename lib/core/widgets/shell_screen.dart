@@ -6,6 +6,8 @@ import 'package:wallpaper/features/categories/logic/categories_cubit.dart';
 import 'package:wallpaper/features/home/logic/home_cubit.dart';
 import 'package:wallpaper/features/home/ui/screens/home_screen.dart';
 import 'package:wallpaper/features/categories/ui/screens/categories_screen.dart';
+import 'package:wallpaper/features/favorites/ui/screens/favorites_screen.dart';
+import 'package:wallpaper/features/favorites/logic/favorites_cubit.dart';
 
 class ShellScreen extends StatefulWidget {
   const ShellScreen({super.key});
@@ -30,6 +32,10 @@ class _ShellScreenState extends State<ShellScreen> {
     BlocProvider<CategoriesCubit>(
       create: (_) => getIt<CategoriesCubit>()..loadCategories(),
       child: const CategoriesBody(),
+    ),
+    BlocProvider<FavoritesCubit>.value(
+      value: getIt<FavoritesCubit>()..getFavorites(),
+      child: const FavoritesBody(),
     ),
   ];
 
@@ -76,6 +82,7 @@ class _ShellScreenState extends State<ShellScreen> {
               children: [
                 _buildNavItem(0, Icons.home_rounded, 'Home'),
                 _buildNavItem(1, Icons.grid_view_rounded, 'Categories'),
+                _buildNavItem(2, Icons.favorite_rounded, 'Favorites'),
               ],
             ),
           ),
@@ -96,7 +103,7 @@ class _ShellScreenState extends State<ShellScreen> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
           gradient: isActive
               ? const LinearGradient(
@@ -113,7 +120,7 @@ class _ShellScreenState extends State<ShellScreen> {
             Icon(
               icon,
               color: isActive ? Colors.white : Colors.white38,
-              size: 22,
+              size: 24,
             ),
             if (isActive) ...[
               const SizedBox(width: 8),
@@ -121,8 +128,9 @@ class _ShellScreenState extends State<ShellScreen> {
                 label,
                 style: const TextStyle(
                   color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 15,
+                  letterSpacing: 0.3,
                 ),
               ),
             ],

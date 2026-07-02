@@ -73,18 +73,21 @@ class _CategoriesBodyState extends State<CategoriesBody>
                           child: const Text(
                             'Categories',
                             style: TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.w800,
+                              fontSize: 32,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: -0.5,
                               color: Colors.white,
                             ),
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 6),
                         const Text(
                           'Explore by theme',
                           style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.white38,
+                            fontSize: 16,
+                            color: Colors.white60,
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: 0.2,
                           ),
                         ),
                       ],
@@ -221,9 +224,9 @@ class _CategoryCardState extends State<_CategoryCard>
                   widget.name,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.3,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.5,
                     shadows: [
                       Shadow(
                         color: Colors.black54,

@@ -3,11 +3,17 @@ import 'package:wallpaper/core/routing/routes.dart';
 import 'package:wallpaper/core/widgets/shell_screen.dart';
 import 'package:wallpaper/features/search/ui/screens/search_screen.dart';
 import 'package:wallpaper/features/home/ui/screens/wallpaper_view_screen.dart';
+import 'package:wallpaper/features/splash/ui/screens/splash_screen.dart';
+import 'package:wallpaper/features/home/data/models/wallpaper_model.dart';
 
 class AppRouter {
   static final router = GoRouter(
-    initialLocation: Routes.homeScreen,
+    initialLocation: Routes.splashScreen,
     routes: [
+      GoRoute(
+        path: Routes.splashScreen,
+        builder: (context, state) => const SplashScreen(),
+      ),
       // Shell handles Home + Categories with bottom nav
       GoRoute(
         path: Routes.homeScreen,
@@ -23,8 +29,8 @@ class AppRouter {
       GoRoute(
         path: Routes.wallpaperViewScreen,
         builder: (context, state) {
-          final imageUrl = state.extra as String? ?? '';
-          return WallpaperViewScreen(imageUrl: imageUrl);
+          final model = state.extra as WallpaperModel;
+          return WallpaperViewScreen(model: model);
         },
       ),
     ],
